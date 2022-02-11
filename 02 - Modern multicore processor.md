@@ -88,8 +88,8 @@ void sinx(int N, int terms, float* x, float* result) {
 		/* Moves singe-precision floats from aligned memory to vector */
 		__m256 origx = _mm256_load_ps(&x[i]);
 		__m256 value = origx;
-		__m256 numer = _m256_mul_ps(origx, _mm256_mul_ps(origx, origx));
-		__m256 denom = _m256_broadcast_ss(&three_fact);
+		__m256 numer = _mm256_mul_ps(origx, _mm256_mul_ps(origx, origx));
+		__m256 denom = _mm256_broadcast_ss(&three_fact);
 		int sign = -1;
 		
 		int j;
