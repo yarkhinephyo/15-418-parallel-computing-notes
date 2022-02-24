@@ -83,7 +83,7 @@ void my_thread_start(void* thread_arg) {
 
 void sinx(int N, int terms, float* x, float* result) {
 	float three_fact = 6;  // 3!
-	int;
+	int i;
 	for (i=0; i<N; i+=8) { // 256-bit vector -> 8 integers
 		/* Moves singe-precision floats from aligned memory to vector */
 		__m256 origx = _mm256_load_ps(&x[i]);
@@ -143,6 +143,12 @@ The efficiency is 100% because the resources are always utilized.
 
 ![](images/Pasted%20image%2020220207145901.png)
 
+**Hyperthreadings vs OS-scheduled threads**
+
+In hyperthreading the thread isn't "idle". Instructions are executing, but different instructions can use different resources of CPU (Some waits for a couple of cycles for memory). Hyperthreading squeezes in executing 2 different programs onto one core for some individual performance penalty.
+
+OS-scheduled threads operate on a higher granularity. Switching between threads (context switch) takes 1000+ cycles.
+
 **Logical cores**: Number of physical cores times the number of threads that can run on each core.
 
 **Throughput computing trade-off**: Potentially increase time to complete work by any one thread so that overall system throughput can be increased with multiple threads.
@@ -165,7 +171,7 @@ The efficiency is 100% because the resources are always utilized.
 
 ![](images/Pasted%20image%2020220207162514.png)
 
-**NVIDIA GPX 1080**: 20 SM cores. 20960 pieces of data to be processed concurrently. Unlike CPU, GPU assumes that there is a large memory bandwidth. Caches are much smaller so there is more memory accesses. Having many threads hide latencies.
+**NVIDIA GPX 1080**: 20 SM cores. 40960 pieces of data to be processed concurrently. Unlike CPU, GPU assumes that there is a large memory bandwidth. Caches are much smaller so there is more memory accesses. Having many threads hide latencies.
 
 ![](images/Pasted%20image%2020220207163035.png)
 
