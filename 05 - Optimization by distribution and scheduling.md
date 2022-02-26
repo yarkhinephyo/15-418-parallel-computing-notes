@@ -126,6 +126,8 @@ void quick_sort(int* begin, int* end) {
 
 In "child stealing", the caller thread records child for later execution (Add to queue). In "continuation stealing", the caller thread records continuation for later execution. Think of them as BFS and DFS respectively.
 
+If the workload is more balanced, less stealing is required. Stealing is more expensive than spawns due to requiring locks and barriers.
+
 ![](images/Pasted%20image%2020220225205047.png)
 
 **Quicksort example scheduling**
