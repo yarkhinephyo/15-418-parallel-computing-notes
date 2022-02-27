@@ -1,8 +1,8 @@
 **SPMD**: Single program multiple data. High level programming languages to program parallelism. The compiled low level machine code may contain SIMD instructions.
 
-**IPSC**: Intel SPMD Program Compiler
+**ISPC**: Intel SPMD Program Compiler
 
-**Example program with IPSC**
+**Example program with ISPC**
 
 C++ code calls ISPC code.
 
