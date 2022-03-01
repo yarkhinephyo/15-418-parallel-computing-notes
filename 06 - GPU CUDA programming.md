@@ -16,7 +16,7 @@ For CPU, OS loads binary into memory. -> OS selects CPU execution context. -> OS
 
 ![](images/Pasted%20image%2020220226131449.png)
 
-For 2007 NVIDIA Tesla GPU, the application allocates buffers in GPU memory -> Application provides GPU a single kernel program binary. -> Application tells GPU to run the kernel in SPMD fasion.
+For 2007 NVIDIA Tesla GPU, the application allocates buffers in GPU memory -> Application provides GPU a single kernel program binary. -> Application tells GPU to run the kernel in SPMD fashion.
 
 **CUDA**: C-like language to express SPMD programs that run on GPUs. OpenCL is the open standards version of CUDA.
 
@@ -158,7 +158,7 @@ Required resources include 128 threads per block, "B" bytes of local data per th
 
 **NVIDIA GTX 1080 (2016)**: Every core has 96 KB of shared memory. 64 hardware threads. 32-wide SIMD instructions per thread.
 
-Interleaved "multi-threading" where 4 warp contexts can be selected out of 64 (Concurrency). Simultaneous execution of 4 warps at a time. For any warp, up to two runnable instructions can be done (Instruction-level parallelism).
+Interleaved "multi-threading" where 4 warp contexts can be selected out of 64 (Hyperthreading). Simultaneous execution of 4 warps at a time. For any warp, up to two runnable instructions can be done (Instruction-level parallelism).
 
 ![](images/Pasted%20image%2020220226172606.png)
 
