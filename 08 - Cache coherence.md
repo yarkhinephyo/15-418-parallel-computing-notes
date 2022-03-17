@@ -54,7 +54,7 @@ If cache line is modified and another processor wants to read, the cache line is
 
 However, the latest Intel Integrated GPUs do implement.
 
-**False sharing**: Two processors write to different addresses but the addresses map to the same cache line. Cache lines "ping-pong" between different processors, generating significant amounts of communication.
+**False sharing**: Two processors write to different addresses but the addresses map to the same cache line. Cache lines "ping-pong" between different processors as they transit between different MSI states, generating significant amounts of communication.
 
 **False sharing demo**
 
@@ -73,12 +73,60 @@ Each thread updates a position of the counter array many times. The second code 
 
 ```c
 /* Allocate per-thread variable */
+/* 8 threads on 4-core takes 7.2 sec */
 int counter[MAX_THREADS];
 
 /* Allocate per-thread variable with padding */
+/* 8 threads on 4-core takes 3.06 sec */
 struct padded_t {
 	int counter;
 	char padding[CACHE_LINE_SIZE - sizeof(int)];
 }
 padded_t counter[MAX_THREADS];
 ```
+
+**Snooping cache limitation**
+
+Snooping cache coherence protocols relied on broadcasting coherence information to all processors over the chip interconnect. Every time a cache miss occurs, the triggering cache communicates with all other caches.
+
+![](images/Pasted%20image%2020220317235250.png)
+
+This may not be scalable when machines get bigger (supercomputers). Every processor may have memory next to it to reduce latency when there is locality. This feature does not not any good if cache coherence requires communicating with all other processors.
+
+![](images/Pasted%20image%2020220317235505.png)
+
+**Directory-based cache coherence**
+
+Directory-based cache coherence avoids expensive broadcast by storng information about the status of a line in one place. For every cache line of memory, there is a directory entry which contains the processors that have the particular line in their caches.
+
+![](images/Pasted%20image%2020220318000919.png)
+
+**Home node**: Node with memory for the particular line. Node 0 is the home node for yellow line.
+
+**Read miss**: If processor 0 wants blue line, it sends a request to processor 1 for reading the data. Processor 1 updates the directory and sends the data to processor 0.
+
+If the dirty bit is off, the processor 1 provides data from its memory.
+
+![](images/Pasted%20image%2020220318001226.png)
+
+If the dirty bit is on, the processor 1 tells the requesting node where to find the updated data (Let's say processor 2). Processor 1 sends a request to processor 2. Processor 2 changes state in cache to SHARED and provides the data to processor 1. Processor 2 provides the data and directory revision to processor 1 (No more dirty bit).
+ 
+**Write miss**: If processor 0 wants to write blue line, it sends a request to processor 1 for writing the data. 
+
+![](images/Pasted%20image%2020220318003139.png)
+
+Processor 1 provides the data and the sharing processors to processor 0.
+
+![](images/Pasted%20image%2020220318003238.png)
+
+Processor 1 sends an invalidation request to the sharing processors so that the blue lines are cleared. Processor 1 waits for acknowledgements from the sharing processors before writing.
+
+![](images/Pasted%20image%2020220318003747.png)
+
+In practice, it is rare to have many processors sharing the same cache line.
+
+**Directory-based cache limitation**
+
+There is a lot of storage overhead for the cache line directories. Storage is proportional to `num_processors x num_lines_in_memory`.
+
+If each cache line is 64 byes (512 bits) and there are 64 nodes, 64 bits will be needed for a directory entry. Thus 12% overhead.
