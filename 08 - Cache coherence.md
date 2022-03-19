@@ -50,6 +50,12 @@ If cache line is modified and another processor wants to read, the cache line is
 
 ![](images/Pasted%20image%2020220301165306.png)
 
+**MESI cache coherence**: If another cache has the data, the cache line is shared. If not, the cache line is exclusive.
+
+![](images/Pasted%20image%2020220319182056.png)
+
+It is common in programs to read and write data together. If a program wants to write immediately after reading, the cache does not waste resources to notify other caches.
+
 **GPUs and cache coherence**: GPUs tend not to implement cache coherence as it introduces some overhead. NVIDIA GPUs have incoherent L1 caches and a single unified L2 cache. L1 caches are write-through to L2 by default.
 
 However, the latest Intel Integrated GPUs do implement.
@@ -130,3 +136,11 @@ In practice, it is rare to have many processors sharing the same cache line.
 There is a lot of storage overhead for the cache line directories. Storage is proportional to `num_processors x num_lines_in_memory`.
 
 If each cache line is 64 byes (512 bits) and there are 64 nodes, 64 bits will be needed for a directory entry. Thus 12% overhead.
+
+**Limited pointer scheme**: In practice, data is only expected to be in a few caches at once. Hence, can store as a list of the nodes instead. We do not need to track a list of all processors for every cache line.
+
+**Directory-based cache in Intel Core i7**
+
+L3 cache stores a directory of all lines. This contains lists of L2 caches containing each line. Coherence messages are only sent to the L2's that contain the line, instead of broadcasting to all L2's.
+
+![](images/Pasted%20image%2020220319181016.png)
