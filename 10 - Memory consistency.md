@@ -1,8 +1,10 @@
-**Memory coherence**: Making memory behave as if caches do not exist. Put all operations involving `X` on a timeline such that the observations of all processors are consistent with the timeline.
+**Memory coherence**: Making memory behave as if caches do not exist. Put all operations involving the _same_ memory location on a timeline such that the observations of all processors are consistent with the timeline.
 
-**Memory consistency**: Defines the allowed behaviour of loads and stores to different addresses in a parallel system. The allowed behaviour should be specified whether or not caches are present.
+**Memory consistency**: Defines the allowed behaviour of loads and stores to different locations (as observed by other processors).
 
-**Memory operation ordering**: Program defines a sequenec of loads and stores.
+**Coherence vs Consistency**: Coherence guarantees that writes to an address _will_ eventually propagate to other processors but consistency deals with _when_ writes to an address propagate to other processors, relative to reads/writes to other addresses.
+
+**Memory operation ordering**: Program defines a sequence of loads and stores. There are four types of memory orderings.
 
 ```
 W -> R   # Write to X must commit before read from Y
@@ -13,7 +15,7 @@ W -> W
 
 If X-write must commit before Y-read, the X-write's results must be visible before the read occurs.
 
-**Sequentially consistent**: Memory system maintains all four memory operation orderings. All processors issue loads and stores in program order.
+**Sequentially consistent**: Memory system maintains all four memory operation orderings. All processors issue loads and stores in program order (Note the complexity caused by superscalar executions on each processor).
 
 For example, with simultaneous threads on a two processor system, "hello" or "world" can be printed by not both.
 
@@ -87,7 +89,7 @@ B = 1;
 
 # Thread 3 (Processor 3)
 while (B == 0);
-A = 1;
+print A;
 ```
 
 Prints can occur before variable assignments for both threads. In sequential consistency, at least something will be printed. With TSO and PC, there is a scenario where nothing will be printed. Both results do not match that of sequential consistency.
@@ -122,14 +124,16 @@ print A;
 ```c++
 // Thread 1
 
-atomic<int> flag;
-int foo;
-foo = 1;
+atomic<int> flag; // Cannot be moved below flag release
+int foo;          // Cannot be moved below flag release
+foo = 1;          // Cannot be moved below flag release
 flag.store(1, std::memory_order_release);
+                  // Can be moved above flag release
 
 // Thread 2
 
-// Other code
+                  // Can be moved below flag acquire
 while (flag.load(std::memory_order_acquire) == 0);
+                  // Cannot be moved above flag acquire
 // Use foo here
 ```

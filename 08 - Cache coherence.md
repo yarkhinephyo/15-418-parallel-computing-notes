@@ -103,7 +103,7 @@ This may not be scalable when machines get bigger (supercomputers). Every proces
 
 **Directory-based cache coherence**
 
-Directory-based cache coherence avoids expensive broadcast by storng information about the status of a line in one place. For every cache line of memory, there is a directory entry which contains the processors that have the particular line in their caches.
+Directory-based cache coherence avoids expensive broadcast by storing information about the status of a line in one place. For every cache line of memory, there is a directory entry which contains the processors that have the particular line in their caches.
 
 ![](images/Pasted%20image%2020220318000919.png)
 
@@ -116,6 +116,8 @@ If the dirty bit is off, the processor 1 provides data from its memory.
 ![](images/Pasted%20image%2020220318001226.png)
 
 If the dirty bit is on, the processor 1 tells the requesting node where to find the updated data (Let's say processor 2). Processor 1 sends a request to processor 2. Processor 2 changes state in cache to SHARED and provides the data to processor 1. Processor 2 provides the data and directory revision to processor 1 (No more dirty bit).
+
+![](images/Pasted%20image%2020220401220824.png)
  
 **Write miss**: If processor 0 wants to write blue line, it sends a request to processor 1 for writing the data. 
 
